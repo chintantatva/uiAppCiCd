@@ -1,0 +1,27 @@
+# for diawi upload you have to genrate token from account and set here
+
+TOKEN=FNODL8LFbtuXdIZmzP5XjxQkVU994O9YdcR0oneze9
+
+cd Documents/UiApp/android
+yarn bump-minor
+./gradlew clean
+./gradlew app:assembleRelease
+
+cd app/build/outputs/apk/release/
+
+
+echo please wait for while we are uploading file
+
+JOB=$(curl https://upload.diawi.com/ -F token=${TOKEN} \
+-F file=@app-release.apk |  \jq '.job')
+
+
+JOBUPDATED="${JOB//\"}"
+
+sleep 5
+
+REQUEST=$"https://upload.diawi.com/status?token=${TOKEN}&job="
+REQUEST+=$JOBUPDATED 
+
+
+ curl -vvv ${REQUEST} | \jq '.'
